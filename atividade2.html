@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Funcionários</title>
+</head>
+<body>
+    <form id="funcionarioForm">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required>
+
+        <label for="idade">Idade:</label>
+        <input type="number" id="idade" required>
+
+        <label for="cargo">Cargo:</label>
+        <select id="cargo" required>
+            <option value="none" selected disabled>Selecione um cargo</option>
+            <option value="Gerente">Gerente</option>
+            <option value="Desenvolvedor">Desenvolvedor</option>
+        </select>
+
+        <div id="departamentoContainer" style="display: none;">
+            <label for="departamento">Departamento:</label>
+            <input type="text" id="departamento">
+        </div>
+
+        <div id="linguagemContainer" style="display: none;">
+            <label for="linguagem">Linguagem:</label>
+            <input type="text" id="linguagem">
+        </div>
+
+        <button type="button" onclick="criarFuncionario()">Criar Funcionário</button>
+    </form>
+
+    <div id="resultado"></div>
+
+    <script>
+        class Funcionario {
+            constructor(nome, idade, cargo) {
+                this.nome = nome;
+                this.idade = idade;
+                this.cargo = cargo;
+            }
+
+            seApresentar() {
+                console.log(`Olá, o meu nome é ${this.nome}, tenho ${this.idade} anos e trabalho como ${this.cargo}.`);
+            }
+
+            trabalhar() {
+                console.log(`${this.nome} está realizando suas atividades como ${this.cargo}.`);
+            }
+        }
+
+        class Gerente extends Funcionario {
+            constructor(nome, idade, departamento) {
+                super(nome, idade, 'Gerente');
+                this.departamento = departamento;
+            }
+
+            gerenciar() {
+                console.log(`${this.nome} está gerenciando o departamento de ${this.departamento}.`);
+            }
+        }
+
+        class Desenvolvedor extends Funcionario {
+            constructor(nome, idade, linguagem) {
+                super(nome, idade, 'Desenvolvedor');
+                this.linguagem = linguagem;
+            }
+
+            programar() {
+                console.log(`${this.nome} está programando em ${this.linguagem}.`);
+            }
+        }
+
+        function exibirErro(mensagem) {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `<p style="color: red;">Erro: ${mensagem}</p>`;
+        }
+
+        function criarFuncionario() {
+            try {
+                const nome = document.getElementById('nome').value;
+                const idade = parseInt(document.getElementById('idade').value);
+                const cargo = document.getElementById('cargo').value;
+
+                if (!nome || isNaN(idade)) {
+                    throw new Error('Preencha todos os campos corretamente.');
+                }
+
+                let funcionario;
+
+                if (cargo === 'Gerente') {
+                    const departamento = document.getElementById('departamento').value;
+                    if (!departamento) {
+                        throw new Error('Preencha o campo de departamento para o Gerente.');
+                    }
+                    funcionario = new Gerente(nome, idade, departamento);
+                } else if (cargo === 'Desenvolvedor') {
+                    const linguagem = document.getElementById('linguagem').value;
+                    if (!linguagem) {
+                        throw new Error('Preencha o campo de linguagem para o Desenvolvedor.');
+                    }
+                    funcionario = new Desenvolvedor(nome, idade, linguagem);
+                }
+
+                funcionario.seApresentar();
+                funcionario.trabalhar();
+
+                if (funcionario instanceof Gerente) {
+                    funcionario.gerenciar();
+                } else if (funcionario instanceof Desenvolvedor) {
+                    funcionario.programar();
+                }
+
+                const resultadoDiv = document.getElementById('resultado');
+                resultadoDiv.innerHTML = `<p style="color: green;">Funcionário criado com sucesso!</p>`;
+            } catch (error) {
+                exibirErro(error.message);
+            }
+        }
+
+        document.getElementById('cargo').addEventListener('change', function () {
+            const departamentoContainer = document.getElementById('departamentoContainer');
+            const linguagemContainer = document.getElementById('linguagemContainer');
+
+            if (this.value === 'Gerente') {
+                departamentoContainer.style.display = 'block';
+                linguagemContainer.style.display = 'none';
+            } else if (this.value === 'Desenvolvedor') {
+                departamentoContainer.style.display = 'none';
+                linguagemContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
